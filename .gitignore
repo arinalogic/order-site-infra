@@ -1,0 +1,16 @@
+# секреты
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+id_ed25519*
+id_rsa*
+# пароли реестра
+htpasswd
+registry/auth/*
+!registry/auth/.gitkeep
+# данные и временное
+data/
+*.log
+.vscode/
