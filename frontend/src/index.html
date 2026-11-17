@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="Студия Лучик помогает малому бизнесу расти с помощью маркетинга и дизайна.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Студия Лучик — маркетинг и дизайн</title>
+  </head>
+  <body>
+    <div class="background-shapes" aria-hidden="true">
+      <span class="shape shape-blue"></span>
+      <span class="shape shape-gold"></span>
+      <span class="shape shape-blue shape-small"></span>
+    </div>
+
+    <main class="page-shell">
+      <header class="intro">
+        <a class="brand" href="/" aria-label="Студия Лучик — на главную">
+          <span class="brand-mark" aria-hidden="true">✦</span>
+          <span>Студия <strong>Лучик</strong></span>
+        </a>
+        <p class="eyebrow">МАРКЕТИНГ И ДИЗАЙН ДЛЯ МАЛОГО БИЗНЕСА</p>
+        <h1>Помогаем вашему делу <span>сиять</span></h1>
+        <p class="intro-copy">
+          Мы — небольшая команда маркетологов и дизайнеров, которая помогает
+          бизнесу находить свой голос и клиентов. Разберёмся в вашей задаче и
+          подберём решение, которое будет работать именно для вас.
+        </p>
+      </header>
+
+      <section class="application-card" aria-labelledby="form-title">
+        <div class="card-heading">
+          <div>
+            <p class="eyebrow">ДАВАЙТЕ ЗНАКОМИТЬСЯ</p>
+            <h2 id="form-title">Расскажите о своей задаче</h2>
+          </div>
+          <span class="sun-icon" aria-hidden="true">☼</span>
+        </div>
+
+        <p class="required-note"><span aria-hidden="true">*</span> Обязательные поля</p>
+        <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+
+        <form id="application-form" novalidate>
+          <div class="field field-wide" id="service-field">
+            <label for="service">Какая услуга вас интересует? <span aria-hidden="true">*</span></label>
+            <select id="service" name="service" required>
+              <option value="" selected disabled>Загрузка услуг...</option>
+            </select>
+            <p id="budget-hint" class="field-hint" hidden></p>
+          </div>
+
+          <div class="field field-wide" id="budget-field" hidden>
+            <div class="budget-heading">
+              <label for="budget">Комфортный бюджет</label>
+              <output id="budget-value" for="budget"></output>
+            </div>
+            <input id="budget" name="budget" type="range" min="0" max="100" value="50">
+            <div class="range-ends" aria-hidden="true">
+              <span id="budget-min"></span>
+              <span id="budget-max"></span>
+            </div>
+          </div>
+
+          <div class="form-divider"><span>Немного о вас</span></div>
+
+          <div class="field" id="first-name-field">
+            <label for="first_name">Имя <span aria-hidden="true">*</span></label>
+            <input id="first_name" name="first_name" type="text" autocomplete="given-name" required>
+          </div>
+          <div class="field" id="last-name-field">
+            <label for="last_name">Фамилия <span aria-hidden="true">*</span></label>
+            <input id="last_name" name="last_name" type="text" autocomplete="family-name" required>
+          </div>
+          <div class="field">
+            <label for="middle_name">Отчество</label>
+            <input id="middle_name" name="middle_name" type="text" autocomplete="additional-name">
+          </div>
+          <div class="field">
+            <label for="phone">Телефон</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel">
+          </div>
+          <div class="field">
+            <label for="email">Электронная почта</label>
+            <input id="email" name="email" type="email" autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="business_niche">Сфера бизнеса</label>
+            <input id="business_niche" name="business_niche" type="text">
+          </div>
+          <div class="field field-wide">
+            <label for="business_info">Расскажите о своём бизнесе</label>
+            <textarea id="business_info" name="business_info" rows="3"></textarea>
+          </div>
+
+          <div class="form-divider"><span>Подробности проекта</span></div>
+
+          <div class="field">
+            <label for="company_size">Размер команды</label>
+            <select id="company_size" name="company_size">
+              <option value="">Выберите вариант</option>
+              <option value="до 10 человек">до 10 человек</option>
+              <option value="11-50">11-50</option>
+              <option value="51-200">51-200</option>
+              <option value="более 200">более 200</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="client_role">Ваша роль</label>
+            <select id="client_role" name="client_role">
+              <option value="">Выберите вариант</option>
+              <option value="Сотрудник">Сотрудник</option>
+              <option value="Руководитель">Руководитель</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="task_volume">Объём задачи</label>
+            <select id="task_volume" name="task_volume">
+              <option value="">Выберите вариант</option>
+              <option value="небольшой">небольшой</option>
+              <option value="средний">средний</option>
+              <option value="крупный">крупный</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="deadline">Когда нужно начать?</label>
+            <select id="deadline" name="deadline">
+              <option value="">Выберите вариант</option>
+              <option value="срочно">срочно</option>
+              <option value="в течение месяца">в течение месяца</option>
+              <option value="в течение квартала">в течение квартала</option>
+              <option value="не срочно">не срочно</option>
+            </select>
+          </div>
+          <div class="field field-wide">
+            <label for="task_type">Какую задачу хотите решить?</label>
+            <input id="task_type" name="task_type" type="text">
+          </div>
+
+          <div class="form-divider"><span>Как с вами связаться?</span></div>
+
+          <div class="field">
+            <label for="preferred_contact_method">Способ связи</label>
+            <select id="preferred_contact_method" name="preferred_contact_method">
+              <option value="">Выберите вариант</option>
+              <option value="телефон">телефон</option>
+              <option value="email">email</option>
+              <option value="мессенджер">мессенджер</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="preferred_contact_time">Удобное время</label>
+            <input id="preferred_contact_time" name="preferred_contact_time" type="text" placeholder="Например, будни после 18:00">
+          </div>
+          <div class="field field-wide">
+            <label for="comments">Комментарий</label>
+            <textarea id="comments" name="comments" rows="3"></textarea>
+          </div>
+
+          <button id="submit-button" class="submit-button" type="submit" disabled>
+            <span>Отправить заявку</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </form>
+      </section>
+
+      <footer class="footer">
+        <span class="footer-star" aria-hidden="true">✦</span>
+        <p>С заботой о вашем деле — студия «Лучик»</p>
+      </footer>
+    </main>
+  </body>
+</html>
