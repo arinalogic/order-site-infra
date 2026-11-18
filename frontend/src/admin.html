@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="robots" content="noindex">
+    <title>Панель администратора — Студия Лучик</title>
+  </head>
+  <body>
+    <main class="admin-shell">
+      <header class="admin-header">
+        <a class="admin-brand" href="/" aria-label="Студия Лучик — на главную">
+          Студия <strong>Лучик</strong>
+        </a>
+        <div class="header-actions">
+          <h1 id="page-title">Панель администратора</h1>
+          <button id="logout-button" class="button button-secondary" type="button" hidden>Выйти</button>
+        </div>
+      </header>
+
+      <p id="notice" class="notice" role="status" aria-live="polite"></p>
+
+      <section id="login-screen" class="auth-card" aria-labelledby="login-title" hidden>
+        <h2 id="login-title">Вход</h2>
+        <form id="login-form" class="auth-form">
+          <div class="field">
+            <label for="login-username">Логин</label>
+            <input id="login-username" name="username" type="text" autocomplete="username" required>
+          </div>
+          <div class="field">
+            <label for="login-password">Пароль</label>
+            <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+          </div>
+          <button class="button button-primary" type="submit">Войти</button>
+          <button id="show-registration" class="button button-link" type="button" hidden>Зарегистрироваться</button>
+        </form>
+      </section>
+
+      <section id="registration-screen" class="auth-card" aria-labelledby="registration-title" hidden>
+        <h2 id="registration-title">Регистрация администратора</h2>
+        <form id="registration-form" class="auth-form">
+          <div class="field">
+            <label for="register-username">Логин</label>
+            <input id="register-username" name="username" type="text" minlength="3" maxlength="50" autocomplete="username" required>
+          </div>
+          <div class="field">
+            <label for="register-email">Электронная почта</label>
+            <input id="register-email" name="email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="register-password">Пароль</label>
+            <input id="register-password" name="password" type="password" minlength="8" maxlength="72" autocomplete="new-password" required>
+          </div>
+          <div class="field">
+            <label for="register-password-confirm">Подтвердите пароль</label>
+            <input id="register-password-confirm" name="password_confirm" type="password" minlength="8" maxlength="72" autocomplete="new-password" required>
+          </div>
+          <button class="button button-primary" type="submit">Зарегистрироваться</button>
+          <button id="back-to-login" class="button button-link" type="button">Назад к входу</button>
+        </form>
+      </section>
+
+      <section id="services-screen" class="services-card" aria-labelledby="services-title" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">УПРАВЛЕНИЕ</p>
+            <h2 id="services-title">Услуги</h2>
+          </div>
+        </div>
+        <div class="services-layout">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Услуга</th>
+                  <th scope="col">Диапазон бюджета</th>
+                  <th scope="col">Обновлено</th>
+                </tr>
+              </thead>
+              <tbody id="services-body"></tbody>
+            </table>
+            <p id="empty-services" class="empty-state" hidden>Услуг пока нет</p>
+          </div>
+          <aside class="actions-panel" aria-label="Действия с услугами">
+            <button id="add-service" class="button button-primary" type="button">Добавить</button>
+            <button id="edit-service" class="button button-secondary" type="button" disabled>Редактировать</button>
+            <button id="delete-service" class="button button-danger" type="button" disabled>Удалить</button>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="service-dialog" class="service-dialog" aria-labelledby="service-dialog-title">
+      <form id="service-form" class="dialog-form">
+        <h2 id="service-dialog-title">Добавить услугу</h2>
+        <div class="field">
+          <label for="service-name">Название услуги</label>
+          <input id="service-name" name="services" type="text" required>
+        </div>
+        <div class="field">
+          <label for="service-budget">Диапазон бюджета</label>
+          <input id="service-budget" name="budget_range" type="text" placeholder="Например, 15k-40k" required>
+          <p class="field-hint">Укажите диапазон, например: 15k-40k или 15000-40000</p>
+        </div>
+        <div class="dialog-actions">
+          <button id="cancel-service" class="button button-secondary" type="button">Отмена</button>
+          <button id="save-service" class="button button-primary" type="submit">Сохранить</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>

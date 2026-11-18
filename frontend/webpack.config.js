@@ -3,7 +3,10 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
-  entry: "./src/index.js",
+  entry: {
+    main: "./src/index.js",
+    admin: "./src/admin.js",
+  },
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "assets/js/[name].[contenthash].js",
@@ -22,6 +25,12 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: "./src/index.html",
       filename: "index.html",
+      chunks: ["main"],
+    }),
+    new HtmlWebpackPlugin({
+      template: "./src/admin.html",
+      filename: "admin.html",
+      chunks: ["admin"],
     }),
     new MiniCssExtractPlugin({
       filename: "assets/css/[name].[contenthash].css",
