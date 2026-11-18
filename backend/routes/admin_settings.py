@@ -6,6 +6,8 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Session
 
 from core.database import get_db
+from core.security import get_current_admin
+from models.admin import Admin
 from models.admin_settings import AdminSettings, AdminSettingsCRUD
 
 router = APIRouter()
@@ -56,13 +58,20 @@ def get_admin_settings(item_id: int, db: DbSession) -> AdminSettings:
 
 
 @router.post("/", response_model=AdminSettingsResponse, status_code=status.HTTP_201_CREATED)
-def create_admin_settings(data: AdminSettingsCreate, db: DbSession) -> AdminSettings:
+def create_admin_settings(
+    data: AdminSettingsCreate,
+    db: DbSession,
+    _: Annotated[Admin, Depends(get_current_admin)],
+) -> AdminSettings:
     return AdminSettingsCRUD.create(db, data.model_dump())
 
 
 @router.put("/{item_id}", response_model=AdminSettingsResponse)
 def update_admin_settings(
-    item_id: int, data: AdminSettingsUpdate, db: DbSession
+    item_id: int,
+    data: AdminSettingsUpdate,
+    db: DbSession,
+    _: Annotated[Admin, Depends(get_current_admin)],
 ) -> AdminSettings:
     item = AdminSettingsCRUD.update(db, item_id, data.model_dump())
     if item is None:
@@ -71,7 +80,9 @@ def update_admin_settings(
 
 
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_admin_settings(item_id: int, db: DbSession) -> Response:
+def delete_admin_settings(
+    item_id: int, db: DbSession, _: Annotated[Admin, Depends(get_current_admin)]
+) -> Response:
     if not AdminSettingsCRUD.delete(db, item_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Settings not found")
     return Response(status_code=status.HTTP_204_NO_CONTENT)

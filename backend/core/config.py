@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     postgres_password: str
     postgres_host: str = "postgres"
     postgres_port: int = 5432
+    secret_key: str
+    access_token_expire_minutes: int = 60
 
 
 settings = Settings()

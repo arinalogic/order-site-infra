@@ -5,3 +5,7 @@ psycopg2-binary
 pydantic
 pydantic-settings
 python-dotenv
+PyJWT
+bcrypt
+email-validator
+python-multipart

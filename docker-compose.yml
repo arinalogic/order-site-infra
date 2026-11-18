@@ -69,6 +69,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: "5432"
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in .env}
     depends_on:
       postgres:
         condition: service_healthy

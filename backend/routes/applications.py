@@ -6,6 +6,8 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Session
 
 from core.database import get_db
+from core.security import get_current_admin
+from models.admin import Admin
 from models.application import Application, ApplicationCRUD
 
 router = APIRouter()
@@ -66,12 +68,16 @@ def create_application(data: ApplicationCreate, db: DbSession) -> Application:
 
 
 @router.get("/", response_model=list[ApplicationResponse])
-def get_all_applications(db: DbSession) -> list[Application]:
+def get_all_applications(
+    db: DbSession, _: Annotated[Admin, Depends(get_current_admin)]
+) -> list[Application]:
     return ApplicationCRUD.get_all(db)
 
 
 @router.get("/{item_id}", response_model=ApplicationResponse)
-def get_application(item_id: int, db: DbSession) -> Application:
+def get_application(
+    item_id: int, db: DbSession, _: Annotated[Admin, Depends(get_current_admin)]
+) -> Application:
     item = ApplicationCRUD.get(db, item_id)
     if item is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Application not found")
