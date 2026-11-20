@@ -11,7 +11,22 @@ const elements = {
   registrationForm: document.querySelector("#registration-form"),
   showRegistration: document.querySelector("#show-registration"),
   backToLogin: document.querySelector("#back-to-login"),
+  statisticsButton: document.querySelector("#statistics-button"),
   logoutButton: document.querySelector("#logout-button"),
+  statisticsDialog: document.querySelector("#statistics-dialog"),
+  closeStatistics: document.querySelector("#close-statistics"),
+  statsDayAverage: document.querySelector("#stats-day-average"),
+  statsDayVisits: document.querySelector("#stats-day-visits"),
+  statsWeekAverage: document.querySelector("#stats-week-average"),
+  statsWeekVisits: document.querySelector("#stats-week-visits"),
+  statsMonthAverage: document.querySelector("#stats-month-average"),
+  statsMonthVisits: document.querySelector("#stats-month-visits"),
+  statsButtonsBody: document.querySelector("#stats-buttons-body"),
+  statsButtonsEmpty: document.querySelector("#stats-buttons-empty"),
+  statsError: document.querySelector("#stats-error"),
+  statsHeatmapTotal: document.querySelector("#stats-heatmap-total"),
+  statsHeatmapEmpty: document.querySelector("#stats-heatmap-empty"),
+  statsHeatmap: document.querySelector("#stats-heatmap"),
   servicesBody: document.querySelector("#services-body"),
   emptyServices: document.querySelector("#empty-services"),
   addService: document.querySelector("#add-service"),
@@ -47,6 +62,7 @@ function showScreen(screen) {
   elements.loginScreen.hidden = screen !== "login";
   elements.registrationScreen.hidden = screen !== "registration";
   elements.servicesScreen.hidden = screen !== "services";
+  elements.statisticsButton.hidden = screen !== "services";
   elements.logoutButton.hidden = screen !== "services";
 }
 
@@ -143,12 +159,134 @@ async function requestJson(url, options) {
 
 function logout(message = "", type = "") {
   sessionStorage.removeItem(TOKEN_KEY);
+  if (elements.statisticsDialog.open) {
+    elements.statisticsDialog.close();
+  }
   services = [];
   selectedServiceId = null;
   elements.servicesBody.replaceChildren();
   updateSelectionButtons();
   showScreen("login");
   showNotice(message, type);
+}
+
+function validateStatistics(summary, heatmap) {
+  const periods = ["day", "week", "month"];
+  if (
+    !summary ||
+    periods.some((period) =>
+      !summary[period] ||
+      typeof summary[period].avg_seconds !== "number" ||
+      !Number.isFinite(summary[period].avg_seconds) ||
+      summary[period].avg_seconds < 0 ||
+      !Number.isInteger(summary[period].visits) ||
+      summary[period].visits < 0
+    ) ||
+    !Array.isArray(summary.top_buttons) ||
+    summary.top_buttons.some((item) =>
+      !item ||
+      typeof item.name !== "string" ||
+      !Number.isInteger(item.count) ||
+      item.count < 0
+    ) ||
+    !heatmap ||
+    !Number.isInteger(heatmap.total_points) ||
+    heatmap.total_points < 0 ||
+    !Array.isArray(heatmap.cells) ||
+    heatmap.cells.some((cell) =>
+      !cell ||
+      !Number.isInteger(cell.x) ||
+      cell.x < 0 ||
+      cell.x > 49 ||
+      !Number.isInteger(cell.y) ||
+      cell.y < 0 ||
+      cell.y > 49 ||
+      !Number.isInteger(cell.count) ||
+      cell.count <= 0
+    )
+  ) {
+    throw new Error("Сервер вернул статистику в неверном формате.");
+  }
+}
+
+function renderStatisticsPeriod(period, averageElement, visitsElement) {
+  const value = period.visits
+    ? `${new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 }).format(period.avg_seconds)} с`
+    : "Данных пока нет";
+  averageElement.textContent = value;
+  visitsElement.textContent = String(period.visits);
+}
+
+function renderStatistics(summary, heatmap) {
+  validateStatistics(summary, heatmap);
+  renderStatisticsPeriod(summary.day, elements.statsDayAverage, elements.statsDayVisits);
+  renderStatisticsPeriod(summary.week, elements.statsWeekAverage, elements.statsWeekVisits);
+  renderStatisticsPeriod(summary.month, elements.statsMonthAverage, elements.statsMonthVisits);
+
+  elements.statsButtonsBody.replaceChildren();
+  elements.statsButtonsEmpty.hidden = summary.top_buttons.length !== 0;
+  summary.top_buttons.forEach((button) => {
+    const row = document.createElement("tr");
+    const nameCell = document.createElement("td");
+    const countCell = document.createElement("td");
+    nameCell.textContent = button.name;
+    countCell.textContent = String(button.count);
+    row.append(nameCell, countCell);
+    elements.statsButtonsBody.append(row);
+  });
+
+  elements.statsHeatmapTotal.textContent = `Всего точек: ${heatmap.total_points}`;
+  const hasCells = heatmap.cells.length > 0;
+  elements.statsHeatmapEmpty.hidden = hasCells;
+  elements.statsHeatmap.hidden = !hasCells;
+  if (!hasCells) {
+    return;
+  }
+
+  const context = elements.statsHeatmap.getContext("2d");
+  if (!context) {
+    throw new Error("Не удалось отобразить карту активности.");
+  }
+  context.clearRect(0, 0, elements.statsHeatmap.width, elements.statsHeatmap.height);
+  const cellSize = elements.statsHeatmap.width / 50;
+  const maxCount = Math.max(...heatmap.cells.map((cell) => cell.count));
+  heatmap.cells.forEach((cell) => {
+    const opacity = 0.12 + (cell.count / maxCount) * 0.78;
+    context.fillStyle = `rgba(57, 125, 165, ${opacity})`;
+    context.fillRect(cell.x * cellSize, cell.y * cellSize, cellSize, cellSize);
+  });
+}
+
+async function loadStatistics() {
+  elements.statsDayAverage.textContent = "Загрузка...";
+  elements.statsDayVisits.textContent = "—";
+  elements.statsWeekAverage.textContent = "Загрузка...";
+  elements.statsWeekVisits.textContent = "—";
+  elements.statsMonthAverage.textContent = "Загрузка...";
+  elements.statsMonthVisits.textContent = "—";
+  elements.statsButtonsBody.replaceChildren();
+  elements.statsButtonsEmpty.hidden = true;
+  elements.statsError.hidden = true;
+  elements.statsError.textContent = "";
+  elements.statsHeatmapTotal.textContent = "Всего точек: —";
+  elements.statsHeatmapEmpty.hidden = true;
+  elements.statsHeatmap.hidden = true;
+  elements.statisticsDialog.showModal();
+
+  try {
+    const [summary, heatmap] = await Promise.all([
+      requestJson("/api/behavior-metrics/summary"),
+      requestJson("/api/behavior-metrics/heatmap"),
+    ]);
+    renderStatistics(summary, heatmap);
+  } catch (error) {
+    if (error.status !== 401) {
+      const message = error.message || "Не удалось загрузить статистику.";
+      elements.statsError.textContent = message;
+      elements.statsError.hidden = false;
+      showNotice(message, "error");
+    }
+  }
 }
 
 async function checkRegistration() {
@@ -458,5 +596,7 @@ elements.backToLogin.addEventListener("click", () => {
   showScreen("login");
 });
 elements.logoutButton.addEventListener("click", () => logout());
+elements.statisticsButton.addEventListener("click", loadStatistics);
+elements.closeStatistics.addEventListener("click", () => elements.statisticsDialog.close());
 bindServiceEvents();
 initialize();

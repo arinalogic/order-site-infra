@@ -320,6 +320,90 @@ tbody tr:focus-visible {
   background: rgba(26, 42, 58, 0.38);
 }
 
+.statistics-dialog {
+  width: min(100% - 32px, 960px);
+  max-width: 960px;
+  max-height: min(90vh, 900px);
+  padding: 0;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--ink);
+  box-shadow: 0 20px 70px rgba(24, 43, 62, 0.2);
+}
+
+.statistics-dialog::backdrop {
+  background: rgba(26, 42, 58, 0.38);
+}
+
+.statistics-content {
+  display: grid;
+  gap: 26px;
+  padding: clamp(20px, 4vw, 32px);
+}
+
+.statistics-heading,
+.statistics-section > h3 {
+  margin: 0;
+}
+
+.statistics-section {
+  display: grid;
+  gap: 14px;
+}
+
+.statistics-section > h3,
+.statistics-card h3 {
+  color: #405168;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.statistics-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.statistics-card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #f9fbfc;
+}
+
+.statistics-card h3 {
+  margin: 0 0 12px;
+}
+
+.statistics-card p {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.statistics-card .statistics-detail,
+.statistics-detail {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.statistics-card .statistics-detail {
+  margin-top: 8px;
+}
+
+#stats-heatmap {
+  display: block;
+  width: min(100%, 500px);
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background-color: #f7f9fb;
+}
+
 .dialog-form {
   padding: 26px;
 }
@@ -344,6 +428,10 @@ tbody tr:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  .statistics-cards {
+    grid-template-columns: 1fr;
+  }
+
   .actions-panel {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -363,6 +451,12 @@ tbody tr:focus-visible {
     align-items: flex-end;
     flex-direction: column-reverse;
     gap: 8px;
+  }
+
+  .header-actions .button {
+    max-width: 100%;
+    padding-right: 10px;
+    padding-left: 10px;
   }
 
   .header-actions h1 {

@@ -15,6 +15,7 @@
         </a>
         <div class="header-actions">
           <h1 id="page-title">Панель администратора</h1>
+          <button id="statistics-button" class="button button-secondary" type="button" hidden>Статистика пользователей</button>
           <button id="logout-button" class="button button-secondary" type="button" hidden>Выйти</button>
         </div>
       </header>
@@ -109,6 +110,58 @@
           <button id="save-service" class="button button-primary" type="submit">Сохранить</button>
         </div>
       </form>
+    </dialog>
+
+    <dialog id="statistics-dialog" class="statistics-dialog" aria-labelledby="statistics-title">
+      <div class="statistics-content">
+        <div class="statistics-heading">
+          <h2 id="statistics-title">Статистика пользователей</h2>
+        </div>
+        <section class="statistics-section" aria-label="Среднее время на сайте">
+          <div class="statistics-cards">
+            <article class="statistics-card">
+              <h3>За день</h3>
+              <p><span id="stats-day-average">Загрузка...</span></p>
+              <p class="statistics-detail">Визитов: <span id="stats-day-visits">—</span></p>
+            </article>
+            <article class="statistics-card">
+              <h3>За неделю</h3>
+              <p><span id="stats-week-average">Загрузка...</span></p>
+              <p class="statistics-detail">Визитов: <span id="stats-week-visits">—</span></p>
+            </article>
+            <article class="statistics-card">
+              <h3>За месяц</h3>
+              <p><span id="stats-month-average">Загрузка...</span></p>
+              <p class="statistics-detail">Визитов: <span id="stats-month-visits">—</span></p>
+            </article>
+          </div>
+        </section>
+        <section class="statistics-section">
+          <h3>Популярные кнопки</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Кнопка</th>
+                  <th scope="col">Нажатия</th>
+                </tr>
+              </thead>
+              <tbody id="stats-buttons-body"></tbody>
+            </table>
+          </div>
+          <p id="stats-buttons-empty" class="empty-state" hidden>Данных пока нет</p>
+        </section>
+        <section class="statistics-section">
+          <h3>Карта активности курсора (heatmap)</h3>
+          <p id="stats-error" class="empty-state" role="status" hidden></p>
+          <p id="stats-heatmap-total" class="statistics-detail">Всего точек: —</p>
+          <p id="stats-heatmap-empty" class="empty-state" hidden>Данных пока нет</p>
+          <canvas id="stats-heatmap" width="500" height="500" aria-label="Карта активности курсора" hidden></canvas>
+        </section>
+        <div class="dialog-actions">
+          <button id="close-statistics" class="button button-secondary" type="button">Закрыть</button>
+        </div>
+      </div>
     </dialog>
   </body>
 </html>
