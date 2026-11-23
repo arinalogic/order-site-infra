@@ -1,4 +1,5 @@
 import "./admin.css";
+import { calculateLeadScore, getLeadTemperature } from "./lead-scoring.js";
 
 const TOKEN_KEY = "admin_access_token";
 
@@ -7,6 +8,7 @@ const elements = {
   loginScreen: document.querySelector("#login-screen"),
   registrationScreen: document.querySelector("#registration-screen"),
   servicesScreen: document.querySelector("#services-screen"),
+  applicationsScreen: document.querySelector("#applications-screen"),
   loginForm: document.querySelector("#login-form"),
   registrationForm: document.querySelector("#registration-form"),
   showRegistration: document.querySelector("#show-registration"),
@@ -32,6 +34,17 @@ const elements = {
   addService: document.querySelector("#add-service"),
   editService: document.querySelector("#edit-service"),
   deleteService: document.querySelector("#delete-service"),
+  refreshApplications: document.querySelector("#refresh-applications"),
+  applicationsError: document.querySelector("#applications-error"),
+  applicationsBody: document.querySelector("#applications-body"),
+  emptyApplications: document.querySelector("#empty-applications"),
+  applicationsTotal: document.querySelector("#applications-total"),
+  applicationsHot: document.querySelector("#applications-hot"),
+  applicationsWarm: document.querySelector("#applications-warm"),
+  applicationsCold: document.querySelector("#applications-cold"),
+  applicationDialog: document.querySelector("#application-dialog"),
+  applicationDetails: document.querySelector("#application-details"),
+  closeApplication: document.querySelector("#close-application"),
   serviceDialog: document.querySelector("#service-dialog"),
   serviceForm: document.querySelector("#service-form"),
   serviceDialogTitle: document.querySelector("#service-dialog-title"),
@@ -42,6 +55,7 @@ const elements = {
 };
 
 let services = [];
+let applications = [];
 let selectedServiceId = null;
 let editingServiceId = null;
 
@@ -62,6 +76,7 @@ function showScreen(screen) {
   elements.loginScreen.hidden = screen !== "login";
   elements.registrationScreen.hidden = screen !== "registration";
   elements.servicesScreen.hidden = screen !== "services";
+  elements.applicationsScreen.hidden = screen !== "services";
   elements.statisticsButton.hidden = screen !== "services";
   elements.logoutButton.hidden = screen !== "services";
 }
@@ -162,8 +177,14 @@ function logout(message = "", type = "") {
   if (elements.statisticsDialog.open) {
     elements.statisticsDialog.close();
   }
+  if (elements.applicationDialog.open) {
+    elements.applicationDialog.close();
+  }
   services = [];
+  applications = [];
   selectedServiceId = null;
+  elements.applicationsBody.replaceChildren();
+  elements.applicationDetails.replaceChildren();
   elements.servicesBody.replaceChildren();
   updateSelectionButtons();
   showScreen("login");
@@ -454,18 +475,220 @@ async function loadServices() {
     selectedServiceId = null;
   }
   renderServices();
+  if (applications.length) {
+    renderApplications();
+  }
+}
+
+function formatBudget(value) {
+  if (value == null || value === "") {
+    return "—";
+  }
+  const amount = typeof value === "string" ? Number(value) : value;
+  return Number.isFinite(amount)
+    ? `${new Intl.NumberFormat("ru-RU").format(amount)} ₽`
+    : String(value);
+}
+
+function applicationDate(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? 0 : date.getTime();
+}
+
+function setApplicationsError(message = "") {
+  elements.applicationsError.textContent = message;
+  elements.applicationsError.hidden = !message;
+}
+
+function applicationRequestError(error, fallback) {
+  if (error.status === 403) {
+    return "Недостаточно прав для просмотра заявок.";
+  }
+  return error instanceof TypeError ? fallback : error.message || fallback;
+}
+
+function createTemperatureBadge(temperature) {
+  const badge = document.createElement("span");
+  badge.className = "temperature-badge";
+  if (temperature === "Горячий") {
+    badge.classList.add("temperature-hot");
+  } else if (temperature === "Тёплый") {
+    badge.classList.add("temperature-warm");
+  } else {
+    badge.classList.add("temperature-cold");
+  }
+  badge.textContent = temperature;
+  return badge;
+}
+
+function renderApplications() {
+  const scored = applications.map((application) => ({
+    application,
+    score: calculateLeadScore(application, services),
+  }));
+  scored.sort((left, right) =>
+    right.score - left.score ||
+    applicationDate(right.application.created_at) - applicationDate(left.application.created_at)
+  );
+
+  const temperatures = scored.map(({ score }) => getLeadTemperature(score));
+  elements.applicationsTotal.textContent = String(scored.length);
+  elements.applicationsHot.textContent = String(temperatures.filter((value) => value === "Горячий").length);
+  elements.applicationsWarm.textContent = String(temperatures.filter((value) => value === "Тёплый").length);
+  elements.applicationsCold.textContent = String(temperatures.filter((value) => value === "Холодный").length);
+  elements.applicationsBody.replaceChildren();
+  elements.emptyApplications.hidden = scored.length !== 0;
+
+  scored.forEach(({ application, score }) => {
+    const row = document.createElement("tr");
+    const viewButton = document.createElement("button");
+    viewButton.className = "button button-secondary application-view";
+    viewButton.type = "button";
+    viewButton.dataset.applicationId = String(application.id);
+    viewButton.textContent = "Просмотр";
+
+    row.append(
+      createCell(score),
+      createCell([application.first_name, application.last_name].filter(Boolean).join(" ")),
+      createCell(application.service || "—"),
+      createCell(formatBudget(application.budget)),
+    );
+    const temperatureCell = document.createElement("td");
+    temperatureCell.append(createTemperatureBadge(getLeadTemperature(score)));
+    row.append(temperatureCell, createCell(application.deadline || "—"));
+    const actionsCell = document.createElement("td");
+    actionsCell.append(viewButton);
+    row.append(actionsCell);
+    elements.applicationsBody.append(row);
+  });
+}
+
+async function loadApplications() {
+  setApplicationsError();
+  elements.refreshApplications.disabled = true;
+  try {
+    const [result] = await Promise.all([
+      requestJson("/api/applications/"),
+      loadServices(),
+    ]);
+    if (
+      !Array.isArray(result) ||
+      result.some((item) =>
+        !item ||
+        typeof item.id !== "number" ||
+        typeof item.first_name !== "string" ||
+        typeof item.last_name !== "string"
+      )
+    ) {
+      throw new Error("Сервер вернул список заявок в неверном формате.");
+    }
+
+    applications = result;
+    renderApplications();
+  } catch (error) {
+    applications = [];
+    renderApplications();
+    elements.applicationsTotal.textContent = "—";
+    elements.applicationsHot.textContent = "—";
+    elements.applicationsWarm.textContent = "—";
+    elements.applicationsCold.textContent = "—";
+    elements.emptyApplications.hidden = true;
+    if (error.status !== 401) {
+      setApplicationsError(applicationRequestError(error, "Не удалось загрузить заявки."));
+    }
+  } finally {
+    elements.refreshApplications.disabled = false;
+  }
+}
+
+const applicationFieldLabels = {
+  id: "Номер заявки",
+  first_name: "Имя",
+  last_name: "Фамилия",
+  middle_name: "Отчество",
+  phone: "Телефон",
+  email: "Электронная почта",
+  business_info: "О компании",
+  business_niche: "Сфера бизнеса",
+  company_size: "Размер команды",
+  client_role: "Роль клиента",
+  task_volume: "Объём задачи",
+  deadline: "Срок",
+  task_type: "Тип задачи",
+  product_of_interest: "Интересующий продукт",
+  service: "Услуга",
+  budget: "Бюджет",
+  preferred_contact_method: "Предпочтительный способ связи",
+  preferred_contact_time: "Предпочтительное время связи",
+  comments: "Комментарий",
+  created_at: "Дата создания",
+};
+
+function displayApplicationValue(value) {
+  if (value == null || value === "") {
+    return "—";
+  }
+  if (typeof value === "object") {
+    return JSON.stringify(value);
+  }
+  return String(value);
+}
+
+function renderApplicationDetails(application) {
+  const details = document.createDocumentFragment();
+  const score = calculateLeadScore(application, services);
+  const summary = [
+    ["Приоритет (баллы)", String(score)],
+    ["Температура", getLeadTemperature(score)],
+  ];
+
+  summary.forEach(([label, value]) => {
+    const term = document.createElement("dt");
+    const description = document.createElement("dd");
+    term.textContent = label;
+    description.textContent = value;
+    details.append(term, description);
+  });
+
+  Object.entries(application).forEach(([key, value]) => {
+    const term = document.createElement("dt");
+    const description = document.createElement("dd");
+    term.textContent = Object.prototype.hasOwnProperty.call(applicationFieldLabels, key)
+      ? applicationFieldLabels[key]
+      : key;
+    description.textContent = displayApplicationValue(value);
+    details.append(term, description);
+  });
+
+  elements.applicationDetails.replaceChildren(details);
+  elements.applicationDialog.showModal();
+}
+
+async function openApplication(applicationId, button) {
+  button.disabled = true;
+  setApplicationsError();
+  try {
+    const application = await requestJson(`/api/applications/${encodeURIComponent(applicationId)}`);
+    if (!application || typeof application !== "object" || Array.isArray(application)) {
+      throw new Error("Сервер вернул заявку в неверном формате.");
+    }
+    renderApplicationDetails(application);
+  } catch (error) {
+    if (error.status !== 401) {
+      const message = error.status === 404
+        ? "Заявка не найдена или уже удалена."
+        : applicationRequestError(error, "Не удалось загрузить заявку.");
+      setApplicationsError(message);
+    }
+  } finally {
+    button.disabled = false;
+  }
 }
 
 async function openServices() {
   showScreen("services");
   showNotice();
-  try {
-    await loadServices();
-  } catch (error) {
-    if (error.status !== 401) {
-      showNotice(error.message || "Не удалось загрузить список услуг.", "error");
-    }
-  }
+  await loadApplications();
 }
 
 function openServiceDialog(service = null) {
@@ -598,5 +821,13 @@ elements.backToLogin.addEventListener("click", () => {
 elements.logoutButton.addEventListener("click", () => logout());
 elements.statisticsButton.addEventListener("click", loadStatistics);
 elements.closeStatistics.addEventListener("click", () => elements.statisticsDialog.close());
+elements.refreshApplications.addEventListener("click", loadApplications);
+elements.applicationsBody.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-application-id]");
+  if (button) {
+    openApplication(button.dataset.applicationId, button);
+  }
+});
+elements.closeApplication.addEventListener("click", () => elements.applicationDialog.close());
 bindServiceEvents();
 initialize();

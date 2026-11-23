@@ -91,6 +91,52 @@
           </aside>
         </div>
       </section>
+
+      <section id="applications-screen" class="applications-card" aria-labelledby="applications-title" hidden>
+        <div class="section-heading applications-heading">
+          <div>
+            <p class="eyebrow">УПРАВЛЕНИЕ</p>
+            <h2 id="applications-title">Управление заявками</h2>
+          </div>
+          <button id="refresh-applications" class="button button-secondary" type="button">Обновить</button>
+        </div>
+        <p id="applications-error" class="applications-error" role="status" aria-live="polite" hidden></p>
+        <div class="applications-cards" aria-label="Сводка по заявкам">
+          <article class="applications-card-stat">
+            <h3>Всего заявок</h3>
+            <p id="applications-total">—</p>
+          </article>
+          <article class="applications-card-stat">
+            <h3>Горячие</h3>
+            <p id="applications-hot">—</p>
+          </article>
+          <article class="applications-card-stat">
+            <h3>Тёплые</h3>
+            <p id="applications-warm">—</p>
+          </article>
+          <article class="applications-card-stat">
+            <h3>Холодные</h3>
+            <p id="applications-cold">—</p>
+          </article>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Приоритет (баллы)</th>
+                <th scope="col">Клиент</th>
+                <th scope="col">Услуга</th>
+                <th scope="col">Бюджет</th>
+                <th scope="col">Температура</th>
+                <th scope="col">Срок</th>
+                <th scope="col">Действия</th>
+              </tr>
+            </thead>
+            <tbody id="applications-body"></tbody>
+          </table>
+          <p id="empty-applications" class="empty-state" hidden>Заявок пока нет</p>
+        </div>
+      </section>
     </main>
 
     <dialog id="service-dialog" class="service-dialog" aria-labelledby="service-dialog-title">
@@ -160,6 +206,18 @@
         </section>
         <div class="dialog-actions">
           <button id="close-statistics" class="button button-secondary" type="button">Закрыть</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="application-dialog" class="application-dialog" aria-labelledby="application-dialog-title">
+      <div class="application-dialog-content">
+        <div class="statistics-heading">
+          <h2 id="application-dialog-title">Заявка</h2>
+        </div>
+        <dl id="application-details" class="application-details"></dl>
+        <div class="dialog-actions">
+          <button id="close-application" class="button button-secondary" type="button">Закрыть</button>
         </div>
       </div>
     </dialog>

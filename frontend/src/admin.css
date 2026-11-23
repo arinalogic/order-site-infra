@@ -107,7 +107,8 @@ button:disabled {
 }
 
 .auth-card,
-.services-card {
+.services-card,
+.applications-card {
   margin-top: 24px;
   padding: clamp(20px, 4vw, 32px);
   border: 1px solid var(--line);
@@ -236,6 +237,82 @@ h2 {
   margin-bottom: 22px;
 }
 
+.applications-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.applications-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.applications-card-stat {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #f9fbfc;
+}
+
+.applications-card-stat h3 {
+  margin: 0 0 12px;
+  color: #405168;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.applications-card-stat p {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.applications-error {
+  margin: 0 0 18px;
+  padding: 12px 15px;
+  border: 1px solid #f0c9c1;
+  border-radius: 8px;
+  background: #fff4f1;
+  color: var(--red);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.temperature-badge {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.temperature-hot {
+  background: #fff0ed;
+  color: #a84736;
+}
+
+.temperature-warm {
+  background: #fff7dd;
+  color: #85610b;
+}
+
+.temperature-cold {
+  background: #eaf5fb;
+  color: #286d96;
+}
+
+.application-view {
+  min-height: 34px;
+  padding: 6px 11px;
+  white-space: nowrap;
+}
+
 .eyebrow {
   margin: 0 0 5px;
   color: var(--blue);
@@ -337,6 +414,52 @@ tbody tr:focus-visible {
   background: rgba(26, 42, 58, 0.38);
 }
 
+.application-dialog {
+  width: min(100% - 32px, 760px);
+  max-width: 760px;
+  max-height: min(90vh, 900px);
+  padding: 0;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--ink);
+  box-shadow: 0 20px 70px rgba(24, 43, 62, 0.2);
+}
+
+.application-dialog::backdrop {
+  background: rgba(26, 42, 58, 0.38);
+}
+
+.application-dialog-content {
+  display: grid;
+  gap: 22px;
+  padding: clamp(20px, 4vw, 32px);
+}
+
+.application-details {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.7fr) minmax(0, 1.3fr);
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+
+.application-details dt,
+.application-details dd {
+  min-width: 0;
+  margin: 0;
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;
+  font-size: 14px;
+}
+
+.application-details dt {
+  background: #f7f9fb;
+  color: #617185;
+  font-weight: 800;
+}
+
 .statistics-content {
   display: grid;
   gap: 26px;
@@ -432,6 +555,10 @@ tbody tr:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  .applications-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .actions-panel {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -461,6 +588,27 @@ tbody tr:focus-visible {
 
   .header-actions h1 {
     text-align: right;
+  }
+
+  .applications-heading {
+    align-items: flex-start;
+  }
+
+  .applications-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .application-details {
+    grid-template-columns: 1fr;
+  }
+
+  .application-details dt {
+    padding-bottom: 4px;
+    border-bottom: 0;
+  }
+
+  .application-details dd {
+    padding-top: 4px;
   }
 
   th,
